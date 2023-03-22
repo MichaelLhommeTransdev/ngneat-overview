@@ -14,12 +14,13 @@ export class TeleportOutletDirective implements OnChanges, OnDestroy {
     // The `teleportOutlet` might be `null|undefined`, but we don't want nullable values to be used
     // as keys for the `ports` map.
     if (changes.teleportOutlet && typeof this.teleportOutlet === 'string') {
-      this.service.ports.set(this.teleportOutlet, this.vcr);
-      this.service.newOutlet(this.teleportOutlet);
+      this.service.newOutlet(this.teleportOutlet, this.vcr);
     }
   }
 
   ngOnDestroy(): void {
-    this.service.ports.delete(this.teleportOutlet);
+    if(this.teleportOutlet) {
+      this.service.deleteOutlet(this.teleportOutlet)
+    }
   }
 }

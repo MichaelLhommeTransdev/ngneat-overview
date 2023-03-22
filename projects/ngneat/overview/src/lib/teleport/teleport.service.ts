@@ -6,16 +6,22 @@ import { filter, map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class TeleportService {
-  private outlets = new BehaviorSubject<string>('');
+  private ports = new Map<string, ViewContainerRef>();
+  private outlets = new BehaviorSubject<string[]>([]);
   private asObservable = this.outlets.asObservable();
 
   outlet$(name: string) {
-    return this.asObservable.pipe(filter(current => current === name), map(name => this.ports.get(name)));
+    return this.asObservable.pipe(map(_ => this.ports.get(name)));
   }
 
-  ports = new Map<string, ViewContainerRef>();
-
-  newOutlet(name: string) {
-    this.outlets.next(name);
+  newOutlet(name: string, vcr: ViewContainerRef) {
+    this.ports.set(name, vcr);
+    this.outlets.next([ ...this.outlets.value, name]);
   }
+  
+  deleteOutlet(name: string) {
+    this.ports.delete(name);
+    this.outlets.next(this.outlets.value.filter(n => n !== name));
+  }
+
 }
